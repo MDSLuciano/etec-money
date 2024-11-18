@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum TransactionType {
+  credit
+  debit
+}
+
+model Transaction {
+  id        Int             @id @default(autoincrement()) // Define o campo id como chave primária e autoincrementável
+  title     String // Campo para o título da transação
+  amount    Float // Campo para o valor da transação
+  type      TransactionType // Campo para o tipo da transação
+  createdAt DateTime        @default(now()) @map("created_at") // Campo para a data de criação, com o momento atual como valor padrão. Mapeado para 'created_at' no banco de dados
+
+  @@map("transactions") // Mapeia o modelo para a tabela "transactions" no banco de dados
+}
+
+model User {
+  id           Int    @id @default(autoincrement())
+  name         String
+  email        String @unique
+  passwordHash String @map("password_hash")
+
+  @@map("users")
+}
