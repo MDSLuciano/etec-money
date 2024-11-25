@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import z from "zod";
 import { prisma } from "../lib/prisma";
-import { hash } from 'bcryptjs'
+import { compare, hash } from 'bcryptjs'
 
 export async function authenticationRoutes(app: FastifyInstance){
     app.post('/auth/register', async (request, reply) => {
@@ -34,5 +34,40 @@ export async function authenticationRoutes(app: FastifyInstance){
         })
 
         return reply.status(201).send()
+    })
+
+    app.post('/auth/login', async (request, reply) => {
+        const loginUserBodySchema = z.object({
+            email: z.string().email(),
+            password: z.string().min(6)
+        })
+
+        const { email, password } = loginUserBodySchema.parse(request.body)
+
+        const user = await prisma.user.findUnique({
+            where: {
+                email
+            }
+        })
+
+        if(!user) {
+            return reply.status(401).send({ error: 'Invalid credentials' })
+        }
+
+        const passwordMatches = await compare(password, user.passwordHash)
+
+        if (!passwordMatches) {
+            return reply.status(401).send({ error: 'Invalid credentials' })
+        }
+
+        // Gera o token (JWT)
+        const token = await reply.jwtSign({}, {
+            sign: {
+                sub: user.id.toString(),
+                expiresIn: "1d"
+            }
+        })
+
+        return reply.send({token})
     })
 }

@@ -1,9 +1,16 @@
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { prisma } from '../lib/prisma'
-import { title } from 'process'
 
 export async function transactionsRoutes(app: FastifyInstance) {
+  app.addHook('onRequest', async (request, reply) => {
+    try {
+      await request.jwtVerify()
+    } catch (error) {
+      return reply.status(401).send({ error: 'Unauthorized' })
+    }
+  })
+
   app.post('/transactions', async (request, reply) => {
     // Define o esquema de validação para o corpo da requisição
     const createTransactionBodySchema = z.object({
@@ -18,6 +25,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
     // Cria um registro na tabela de transações do banco de dados
     await prisma.transaction.create({
       data: {
+        userId: Number(request.user.sub),
         title,
         amount,
         type
@@ -39,33 +47,35 @@ export async function transactionsRoutes(app: FastifyInstance) {
     })
 
     // Extrai os parâmetros de busca da requisição e valida com o esquema
-        const { order, title, type, page, limit } = searchTransactionsQuerySchema.parse(request.query)
-    
-      // Busca as transações no banco de dados com base nos filtros especificados
-        const transactions = await prisma.transaction.findMany({
+    const { order, title, type, page, limit } = searchTransactionsQuerySchema.parse(request.query)
+
+    // Busca as transações no banco de dados com base nos filtros especificados
+    const transactions = await prisma.transaction.findMany({
       orderBy: {
         id: order // Ordena as transações por id em ordem decrescente
       },
       take: limit, // Limita o número de transações retornadas
       skip: (page - 1) * limit, // Pula as transações das páginas anteriores
       where: {
+        userId: Number(request.user.sub),
         type, // Filtra as transações pelo tipo (crédito ou débito)
         title: {
-          contains: title, // Filtra as transações pelo título
+          contains: title // Filtra as transações pelo título
         }
       }
     })
-    
-        // Conta o total de transações no banco de dados com base nos filtros especificados
-        const totalTransactions = await prisma.transaction.count({
+
+    // Conta o total de transações no banco de dados com base nos filtros especificados
+    const totalTransactions = await prisma.transaction.count({
       where: {
+        userId: Number(request.user.sub),
         type, // Filtra as transações pelo tipo (crédito ou débito)
         title: {
-          contains: title, // Filtra as transações pelo título
+          contains: title // Filtra as transações pelo título
         }
       }
     })
-  
+
     // Retorna o array de transações dentro de um objeto como resposta, além de metadados sobre a paginação
     return reply.send({
       transactions,
@@ -87,6 +97,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
     // Busca a transação pelo id
     const transaction = await prisma.transaction.findUnique({
       where: {
+        userId: Number(request.user.sub),
         id
       }
     })
@@ -113,7 +124,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
       type: z.enum(['credit', 'debit'])
     })
 
-    // Extrai o id da transação dos parametros da rota da requisição e valida com o esquema
+    // Extrai o id da transação dos parâmetros da rota da requisição e valida com o esquema
     const { id } = updateTransactionParamsSchema.parse(request.params)
 
     // Extrai os dados da transação do corpo da requisição e valida com o esquema
@@ -122,6 +133,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
     // Busca a transação pelo id
     const transaction = await prisma.transaction.findUnique({
       where: {
+        userId: Number(request.user.sub),
         id
       }
     })
@@ -134,6 +146,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
     // Atualiza a transação no banco de dados
     await prisma.transaction.update({
       where: {
+        userId: Number(request.user.sub),
         id,
       },
       data: {
@@ -159,6 +172,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
     // Deleta a transação do banco de dados
     const transaction = await prisma.transaction.delete({
       where: {
+        userId: Number(request.user.sub),
         id
       }
     })
@@ -179,6 +193,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
         amount: true,
       },
       where: {
+        userId: Number(request.user.sub),
         type: 'credit'
       },
     })
@@ -191,6 +206,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
         amount: true,
       },
       where: {
+        userId: Number(request.user.sub),
         type: 'debit'
       },
     })

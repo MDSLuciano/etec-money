@@ -4,11 +4,16 @@ import { ZodError } from 'zod'
 import { fromZodError } from 'zod-validation-error'
 import cors from "@fastify/cors"
 import { authenticationRoutes } from './routes/authentication'
+import fastifyJwt from '@fastify/jwt'
 
 const app = fastify()
 
 app.register(cors, {
   origin: "*",
+})
+
+app.register(fastifyJwt,{
+  secret:"h983,8416824rio34ci%¨&(%&¨$¨*%$#jhm43oir34ijroc43m"
 })
 
 

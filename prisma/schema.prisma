@@ -25,14 +25,18 @@ model Transaction {
   type      TransactionType // Campo para o tipo da transação
   createdAt DateTime        @default(now()) @map("created_at") // Campo para a data de criação, com o momento atual como valor padrão. Mapeado para 'created_at' no banco de dados
 
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @default(1) @map("user_id")
+
   @@map("transactions") // Mapeia o modelo para a tabela "transactions" no banco de dados
 }
 
 model User {
-  id           Int    @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   name         String
-  email        String @unique
-  passwordHash String @map("password_hash")
+  email        String        @unique
+  passwordHash String        @map("password_hash")
+  Transaction  Transaction[]
 
   @@map("users")
 }
