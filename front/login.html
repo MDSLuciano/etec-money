@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ETEC Money - Login</title>
+    <link rel="icon" type="image/x-icon" href="/assets/icon.ico" />
+    <link href="styles.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="tailwind.config.js"></script>
+  </head>
+  <body class="bg-gray-900">
+    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+      <div class="w-full bg-gray-800 border border-gray-700 rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
+        <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+          <div class="flex flex-row mb-6 items-center justify-center gap-2">
+            <h1 class="text-5xl font-bold text-center text-white">Etec Money</h1>
+            <img src="/assets/icon.ico" class="h-14 pt-4" />
+          </div>
+          <form id="formLogin" class="space-y-4 md:space-y-6">
+            <div>
+              <label for="email" class="block mb-2 text-sm font-medium text-white">Email</label>
+              <input type="email" name="email" id="email" class="bg-gray-700 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Email" required="" />
+            </div>
+            <div>
+              <label for="senha" class="block mb-2 text-sm font-medium text-white">Senha</label>
+              <input type="password" name="senha" id="senha" placeholder="******" class="bg-gray-700 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required="" />
+            </div>
+            <button type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Login</button>
+            <div class="flex justify-center">
+              <p class="text-sm font-light text-gray-400">Não possui uma conta? <a href="cadastro.html" class="font-medium hover:underline text-primary-500">Cadastre-se</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="scripts/login.js"></script>
+</html>
